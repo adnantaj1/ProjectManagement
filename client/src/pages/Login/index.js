@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Input, Button, message } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Divider from '../../components/Divider';
 import { LoginUser } from '../../apicalls/users';
 
 function Login() {
+  const navigate = useNavigate();
   const onFinish = async (values) => {
     try {
       const response = await LoginUser(values);
@@ -19,6 +20,13 @@ function Login() {
       message.error(err.message);
     }
   };
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      navigate('/');
+    }
+  }, []);
+
   return (
     <div className='grid grid-cols-2'>
       <div className='bg-primary h-screen flex flex-col justify-center items-center'>

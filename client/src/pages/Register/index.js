@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Input, Button, message } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Divider from '../../components/Divider';
 import { RegisterUser } from '../../apicalls/users';
 
 function Register() {
+  const navigate = useNavigate();
   const onFinish = async (values) => {
     try {
       const response = await RegisterUser(values);
       if (response.success) {
         message.success(response.message);
+        navigate('/login');
       } else {
         throw new Error(response.message);
       }
@@ -17,6 +19,13 @@ function Register() {
       message.error(error.message);
     }
   };
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      navigate('/');
+    }
+  }, []);
+
   return (
     <div className='grid grid-cols-2'>
       <div className='bg-primary h-screen flex flex-col justify-center items-center'>

@@ -8,7 +8,7 @@ export const apiRequest = async (method, url, payload) => {
       data: payload,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
     return response.data;

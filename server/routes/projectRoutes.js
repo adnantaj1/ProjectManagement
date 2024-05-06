@@ -26,11 +26,55 @@ router.post('/create-project', authMiddleware, async (req, res) => {
 router.post('/get-all-projects', authMiddleware, async (req, res) => {
   try {
     const filters = req.query.filters;
-    const projects = await Project.find(filters || {});
+    const projects = await Project.find(filters || {}).sort({ createdAt: -1 });
     res.send({
       success: true,
       data: projects,
       message: 'Projects fetched successfully',
+      status: 200,
+    })
+  } catch (err) {
+    res.send({
+      success: false,
+      error: err.message,
+      status: 500,
+    })
+  }
+});
+
+// edit project
+router.post('/edit-project', authMiddleware, async (req, res) => {
+  try {
+    const project = await Project.findByIdAndUpdate(req.body._id, req.body);
+    if (!project) {
+      throw new Error('Project not found');
+    }
+    res.send({
+      success: true,
+      data: project,
+      message: 'Project updated successfully',
+      status: 200,
+    })
+  } catch (err) {
+    res.send({
+      success: false,
+      error: err.message,
+      status: 500,
+    })
+  }
+});
+
+// delete project
+router.post('/delete-project', authMiddleware, async (req, res) => {
+  try {
+    const project = await Project.findByIdAndDelete(req.body._id);
+    if (!project) {
+      throw new Error('Project not found');
+    }
+    res.send({
+      success: true,
+      data: project,
+      message: 'Project deleted successfully',
       status: 200,
     })
   } catch (err) {

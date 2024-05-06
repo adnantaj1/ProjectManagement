@@ -1,13 +1,14 @@
 import React from 'react';
-import { Button, Table } from 'antd';
+import { Button, Table, message } from 'antd';
 import ProjectForm from './ProjectForm';
 import { useDispatch, useSelector } from "react-redux";
 import { SetLoading } from "../../../redux/loadersSlice";
-import { GetAllProjects } from "../../../apicalls/projects";
+import { GetAllProjects, DeleteProject } from "../../../apicalls/projects";
 import { getDateFormat } from '../../../utils/helpers';
 
 
 function Projects() {
+  const [selectedProject, setSelectedProject] = React.useState(null);
   const [projects, setProjects] = React.useState([]);
   const [show, setShow] = React.useState(false)
   const { user } = useSelector((state) => state.users);
@@ -22,6 +23,22 @@ function Projects() {
       } else {
         throw new Error(response.error);
       }
+    } catch (err) {
+      dispatch(SetLoading(false))
+    }
+  };
+
+  const onDelete = async (id) => {
+    try {
+      dispatch(SetLoading(true));
+      const response = await DeleteProject(id);
+      if (response.success) {
+        message.success(response.message);
+        getData();
+      } else {
+        throw new Error(response.error);
+      }
+      dispatch(SetLoading(false));
     } catch (err) {
       dispatch(SetLoading(false))
     }
@@ -47,6 +64,7 @@ function Projects() {
     {
       title: 'Status',
       dataIndex: 'status',
+      render: (text) => text.toUpperCase(),
     },
     {
       title: 'Created At',
@@ -59,8 +77,15 @@ function Projects() {
       render: (text, record) => {
         return (
           <div className='flex gap-6'>
-            <i class="ri-delete-bin-line"></i>
-            <i class="ri-pencil-line"></i>
+            <i class="ri-delete-bin-line"
+              onClick={() => onDelete(record._id)}
+            ></i>
+            <i class="ri-pencil-line"
+              onClick={() => {
+                setSelectedProject(record);
+                setShow(true);
+              }}
+            ></i>
           </div>
         );
       },
@@ -70,7 +95,10 @@ function Projects() {
     <div>
       <div className='flex justify-end'>
         <Button type='default'
-          onClick={() => setShow(true)}
+          onClick={() => {
+            setSelectedProject(null);
+            setShow(true)
+          }}
         > Add Project</Button>
       </div>
       <Table columns={columns} dataSource={projects}
@@ -78,6 +106,7 @@ function Projects() {
       />
       {show && <ProjectForm show={show} setShow={setShow}
         reloadData={getData}
+        project={selectedProject}
       />}
     </div>
   );

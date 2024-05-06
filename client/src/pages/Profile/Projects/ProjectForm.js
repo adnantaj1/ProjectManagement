@@ -3,7 +3,7 @@ import { Modal, Form, Input, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { useDispatch, useSelector } from "react-redux";
 import { SetLoading } from "../../../redux/loadersSlice";
-import { CreateProject } from "../../../apicalls/projects";
+import { CreateProject, EditProject } from "../../../apicalls/projects";
 
 function ProjectForm({
   show,
@@ -18,8 +18,11 @@ function ProjectForm({
     try {
       console.log(values);
       dispatch(SetLoading(true));
+      let response = null;
       if (project) {
         // update project
+        values._id = project._id;
+        response = await EditProject(values);
       } else {
         // create project
         values.owner = user._id;
@@ -29,16 +32,16 @@ function ProjectForm({
             role: 'owner',
           },
         ];
-        const response = await CreateProject(values);
-        if (response.success) {
-          message.success(response.message);
-          reloadData();
-          setShow(false);
-        } else {
-          throw new Error(response.error);
-        }
-        dispatch(SetLoading(false));
+        response = await CreateProject(values);
       }
+      if (response.success) {
+        message.success(response.message);
+        reloadData();
+        setShow(false);
+      } else {
+        throw new Error(response.error);
+      }
+      dispatch(SetLoading(false));
     } catch (err) {
       dispatch(SetLoading(false))
     }
@@ -46,7 +49,7 @@ function ProjectForm({
   return (
     <div>
       <Modal
-        title='Add Project'
+        title={project ? 'EDIT PROJECT' : 'CREATE PROJECT'}
         open={show}
         onCancel={() => setShow(false)}
         centered={true}
@@ -59,6 +62,7 @@ function ProjectForm({
         <Form layout='vertical'
           ref={formRef}
           onFinish={onFinish}
+          initialValues={project}
         >
           <Form.Item
             label='Project Name'

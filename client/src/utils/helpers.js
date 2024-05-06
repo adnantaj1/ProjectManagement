@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export const getAntdFormInputRules =
   [
     {
@@ -5,3 +7,7 @@ export const getAntdFormInputRules =
       message: 'Required',
     }
   ];
+
+export const getDateFormat = (date) => {
+  return moment(date).format('MMMM Do YYYY h:mm A');
+}

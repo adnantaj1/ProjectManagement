@@ -4,11 +4,15 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectPage from './components/ProtectedPage';
 import Profile from './pages/Profile';
+import { useSelector } from 'react-redux';
+import Spinner from './components/Spinner';
 
 
 function App() {
+  const { loading } = useSelector((state) => state.loaders);
   return (
     <div>
+      {loading && <Spinner />}
       <BrowserRouter>
         <Routes>
           <Route path="/"

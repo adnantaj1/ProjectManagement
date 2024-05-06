@@ -4,19 +4,24 @@ import { useNavigate } from 'react-router-dom';
 import { GetLoggedInUser } from '../apicalls/users';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetUser } from '../redux/usersSlice';
+import { SetLoading } from '../redux/loadersSlice';
 function ProtectPage({ children }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.users);
   const getUser = async () => {
     try {
+      dispatch(SetLoading(true));
       const response = await GetLoggedInUser();
+      dispatch(SetLoading(false));
       if (response.success) {
         dispatch(SetUser(response.data));
       } else {
         throw new Error(response.message);
       }
     } catch (err) {
+
+      dispatch(SetLoading(false));
       message.error(err.message);
       localStorage.removeItem('token');
       navigate('/login');

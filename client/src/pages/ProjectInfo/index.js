@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { message, Tabs } from 'antd';
 import { GetProjectById } from '../../apicalls/projects';
@@ -10,6 +10,8 @@ import Tasks from './Tasks';
 import Members from './Members';
 
 function ProjectInfo() {
+  const [currentUserRole, setCurrentUserRole] = useState('');
+  const { user } = useSelector(state => state.users)
   const [project, setProject] = useState(null);
   const dispatch = useDispatch();
   const params = useParams();
@@ -20,6 +22,8 @@ function ProjectInfo() {
       dispatch(SetLoading(false));
       if (response.success) {
         setProject(response.data);
+        const currentUser = response.data.members.find(member => member.user._id === user._id);
+        setCurrentUserRole(currentUser.role);
       } else {
         throw new Error(response.message);
       }
@@ -36,7 +40,7 @@ function ProjectInfo() {
   return (
     project && (
       <div>
-        <div className='flex justify-between'>
+        <div className='flex justify-between items-center'>
           <div>
             <h1 className='text-primary text-2xl font-semibold uppercase'>
               {project?.name}
@@ -44,6 +48,12 @@ function ProjectInfo() {
             <span className='text-gray-600 text-sm'>
               {project?.description}
             </span>
+            <div className='flex gap-5'>
+              <span className='text-gray-600 text-sm font-semibold'>
+                Role
+              </span>
+              <span className='text-gray-600 text-sm uppercase'>{currentUserRole}</span>
+            </div>
           </div>
           <div>
             <div className='flex gap-5'>
@@ -66,7 +76,10 @@ function ProjectInfo() {
             <Tasks />
           </Tabs.TabPane>
           <Tabs.TabPane tab='Members' key='2' >
-            <Members />
+            <Members
+              project={project}
+              reloadData={getData}
+            />
           </Tabs.TabPane>
         </Tabs>
       </div>

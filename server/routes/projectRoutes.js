@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Project = require('../models/projectModel');
+const User = require('../models/userModel');
 const authMiddleware = require('../middlewares/authMiddleware');
 
 //create a new project
@@ -120,6 +121,40 @@ router.post('/delete-project', authMiddleware, async (req, res) => {
       success: true,
       data: project,
       message: 'Project deleted successfully',
+      status: 200,
+    })
+  } catch (err) {
+    res.send({
+      success: false,
+      error: err.message,
+      status: 500,
+    })
+  }
+});
+
+// add member to project
+router.post('/add-member', authMiddleware, async (req, res) => {
+  try {
+    const { email, role, projectId } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.send({
+        success: false,
+        message: 'User does not exist',
+        status: 500,
+      });
+    }
+    await Project.findByIdAndUpdate(projectId, {
+      $push: {
+        members: {
+          user: user._id,
+          role,
+        },
+      },
+    });
+    res.send({
+      success: true,
+      message: 'Member added successfully',
       status: 200,
     })
   } catch (err) {

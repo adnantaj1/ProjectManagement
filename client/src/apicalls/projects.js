@@ -11,3 +11,5 @@ export const EditProject = async (project) => apiRequest('post', '/api/projects/
 export const DeleteProject = async (id) => apiRequest('post', '/api/projects/delete-project', { _id: id });
 
 export const GetProjectsByRole = async (userId) => apiRequest('post', '/api/projects/get-projects-by-role', { userId });
+
+export const AddMemberToProject = async (data) => apiRequest('post', '/api/projects/add-member', data);

@@ -42,6 +42,51 @@ router.post('/get-all-projects', authMiddleware, async (req, res) => {
   }
 });
 
+// get project by id
+router.post('/get-project-by-id', authMiddleware, async (req, res) => {
+  try {
+    const projectId = req.body._id;
+    const project = await Project.findById(projectId).populate('owner').populate('members.user');
+    if (!project) {
+      throw new Error('Project not found');
+    }
+    res.send({
+      success: true,
+      data: project,
+      message: 'Project fetched successfully',
+      status: 200,
+    })
+  } catch (err) {
+    res.send({
+      success: false,
+      error: err.message,
+      status: 500,
+    })
+  }
+});
+
+// get project by role
+router.post('/get-projects-by-role', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const projects = await Project.find({ 'members.user': userId }).sort({
+      createdAt: -1,
+    }).populate('owner');
+    res.send({
+      success: true,
+      data: projects,
+      message: 'Projects fetched successfully',
+      status: 200,
+    })
+  } catch (err) {
+    res.send({
+      success: false,
+      error: err.message,
+      status: 500,
+    })
+  }
+});
+
 // edit project
 router.post('/edit-project', authMiddleware, async (req, res) => {
   try {

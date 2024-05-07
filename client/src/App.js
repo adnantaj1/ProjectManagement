@@ -6,6 +6,7 @@ import ProtectPage from './components/ProtectedPage';
 import Profile from './pages/Profile';
 import { useSelector } from 'react-redux';
 import Spinner from './components/Spinner';
+import ProjectInfo from './pages/ProjectInfo';
 
 
 function App() {
@@ -19,6 +20,13 @@ function App() {
             element={
               <ProtectPage>
                 <Home />
+              </ProtectPage>
+            }
+          />
+          <Route path="/project/:id"
+            element={
+              <ProtectPage>
+                <ProjectInfo />
               </ProtectPage>
             }
           />

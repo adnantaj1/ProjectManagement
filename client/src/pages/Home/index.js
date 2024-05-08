@@ -39,13 +39,13 @@ function Home() {
       </h1>
       <div className='grid grid-cols-4 gap-5 mt-10'>
         {projects.map((project) => (
-          <div className='flex flex-col gap-1 border border-solid border-gray-400 rounded-md p-2 cursor-pointer'
+          <div key={project._id} className='flex flex-col gap-1 border border-solid border-gray-400 rounded-md p-2 cursor-pointer'
             onClick={() => navigate(`/project/${project._id}`)}
           >
             <h1 className='text-primary text-lg uppercase font-semibold'>{project.name}</h1>
             {/* <span className='text-gray-600 text-sm'>
-              {project.description}
-            </span> */}
+      {project.description}
+    </span> */}
             <Divider />
             <div className='flex justify-between'>
               <span className='text-gray-600 text-sm font-semibold'>Created At</span>
@@ -61,6 +61,7 @@ function Home() {
             </div>
           </div>
         ))}
+
       </div>
     </div>
   );

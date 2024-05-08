@@ -1,11 +1,36 @@
 import React from 'react';
-import { Button, Table } from 'antd';
+import { Button, Table, message } from 'antd';
 import MemberForm from './MemberForm';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { SetLoading } from '../../../redux/loadersSlice';
+import { RemoveMemberFromProject } from '../../../apicalls/projects';
 
 function Members({ project, reloadData }) {
   const [showMemberForm, setShowMemberForm] = React.useState(false);
   const { user } = useSelector(state => state.users);
+  const dispatch = useDispatch();
+  const isOwner = project.owner._id === user._id;
+
+  const deleteMember = async (memberId) => {
+    try {
+      dispatch(SetLoading(true));
+      const response = await RemoveMemberFromProject({
+        projectId: project._id,
+        memberId,
+      });
+      if (response.success) {
+        dispatch(SetLoading(false));
+        reloadData();
+        message.success(response.message);
+      } else {
+        throw new Error(response.error);
+      }
+    } catch (err) {
+      dispatch(SetLoading(false));
+      message.error(err.message);
+    }
+  };
+
   const columns = [
     {
       title: 'First Name',
@@ -31,14 +56,20 @@ function Members({ project, reloadData }) {
       title: 'Action',
       dataIndex: 'action',
       render: (text, record) => (
-        <Button type='primary' danger>
+        <Button
+          type='primary' danger
+          onClick={() => deleteMember(record._id)}
+        >
           Remove
         </Button>
       ),
     }
   ];
 
-  const isOwner = project.owner._id === user._id;
+  // if not owner, then don't show the action
+  if (!isOwner) {
+    columns.pop();
+  }
   return (
     <div>
       <div className='flex justify-end'>

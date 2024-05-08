@@ -28,11 +28,50 @@ router.post('/create-task', authMiddleware, async (req, res) => {
 //get all tasks
 router.post('/get-all-tasks', authMiddleware, async (req, res) => {
   try {
-    const tasks = await Task.find(req.body.filters).populate('assignedTo').populate('assignedBy').populate('project');
+    const tasks = await Task.find(req.body.filters)
+      .populate('assignedTo')
+      .populate('assignedBy')
+      .populate('project').sort({ createdAt: -1 });
     res.send({
       success: true,
       data: tasks,
       message: 'Tasks fetched successfully',
+      status: 200,
+    })
+  } catch (err) {
+    res.send({
+      success: false,
+      message: err.message,
+      status: 500,
+    })
+  }
+});
+
+//update a task
+router.post('/update-task', authMiddleware, async (req, res) => {
+  try {
+    await Task.findByIdAndUpdate(req.body._id, req.body);
+    res.send({
+      success: true,
+      message: 'Task updated successfully',
+      status: 200,
+    })
+  } catch (err) {
+    res.send({
+      success: false,
+      message: err.message,
+      status: 500,
+    })
+  }
+});
+
+//delete a task
+router.post('/delete-task', authMiddleware, async (req, res) => {
+  try {
+    await Task.findByIdAndDelete(req.body._id);
+    res.send({
+      success: true,
+      message: 'Task deleted successfully',
       status: 200,
     })
   } catch (err) {

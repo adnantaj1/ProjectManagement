@@ -166,4 +166,20 @@ router.post('/add-member', authMiddleware, async (req, res) => {
   }
 });
 
+// remove member from project
+router.post('/remove-member', async (req, res) => {
+  try {
+    const { memberId, projectId } = req.body;
+    const project = await Project.findById(projectId);
+    project.members.pull(memberId);
+    await project.save();
+  } catch (err) {
+    res.send({
+      success: false,
+      error: err.message,
+      status: 500,
+    })
+  }
+});
+
 module.exports = router;

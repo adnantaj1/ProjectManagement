@@ -10,7 +10,7 @@ import Tasks from './Tasks';
 import Members from './Members';
 
 function ProjectInfo() {
-  const [currentUserRole, setCurrentUserRole] = useState('');
+  const [currentUserRole, setCurrentUserRole] = useState(null);
   const { user } = useSelector(state => state.users)
   const [project, setProject] = useState(null);
   const dispatch = useDispatch();
@@ -23,6 +23,7 @@ function ProjectInfo() {
       if (response.success) {
         setProject(response.data);
         const currentUser = response.data.members.find(member => member.user._id === user._id);
+        console.log(currentUser.role);
         setCurrentUserRole(currentUser.role);
       } else {
         throw new Error(response.message);
@@ -66,7 +67,7 @@ function ProjectInfo() {
               <span className='text-gray-600 text-sm font-semibold'>
                 Created By
               </span>
-              <span className='text-gray-600 text-sm'>{project.owner.firstName} {project.owner.lastName}</span>
+              <span className='text-gray-600 text-sm uppercase'>{project.owner.firstName} {project.owner.lastName}</span>
             </div>
           </div>
         </div>

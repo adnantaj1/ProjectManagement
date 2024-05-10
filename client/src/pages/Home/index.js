@@ -43,9 +43,6 @@ function Home() {
             onClick={() => navigate(`/project/${project._id}`)}
           >
             <h1 className='text-primary text-lg uppercase font-semibold'>{project.name}</h1>
-            {/* <span className='text-gray-600 text-sm'>
-      {project.description}
-    </span> */}
             <Divider />
             <div className='flex justify-between'>
               <span className='text-gray-600 text-sm font-semibold'>Created At</span>

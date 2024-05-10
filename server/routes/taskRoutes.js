@@ -1,9 +1,9 @@
 const router = require('express').Router();
 
 const Task = require('../models/taskModel');
-const Project = require('../models/projectModel');
-const User = require('../models/userModel');
 const authMiddleware = require('../middlewares/authMiddleware');
+const cloudinary = require('../config/cloudinaryConfig');
+const multer = require('multer');
 
 //create a new task
 router.post('/create-task', authMiddleware, async (req, res) => {
@@ -28,7 +28,13 @@ router.post('/create-task', authMiddleware, async (req, res) => {
 //get all tasks
 router.post('/get-all-tasks', authMiddleware, async (req, res) => {
   try {
-    const tasks = await Task.find(req.body.filters)
+    Object.keys(req.body).forEach((key) => {
+      if (req.body[key] === 'all') {
+        delete req.body[key];
+      }
+    })
+    delete req.body['userId'];
+    const tasks = await Task.find(req.body)
       .populate('assignedTo')
       .populate('assignedBy')
       .populate('project').sort({ createdAt: -1 });
@@ -80,6 +86,52 @@ router.post('/delete-task', authMiddleware, async (req, res) => {
       message: err.message,
       status: 500,
     })
+  }
+});
+
+// create multer storage
+const storage = multer.diskStorage({
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + file.originalname);
+  },
+});
+
+router.post("/upload-image", authMiddleware, multer({ storage: storage }).single("file"), async (req, res) => {
+  console.log(req.file);
+  console.log(req.body);
+  if (!req.file) {
+    return res.status(400).send({
+      success: false,
+      message: "No file uploaded"
+    });
+  }
+  try {
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "tasks",
+    });
+    const imageURL = result.secure_url;
+
+    await Task.findOneAndUpdate(
+      { _id: req.body.taskId },
+      {
+        $push: {
+          attachments: imageURL,
+        },
+      }
+    );
+
+    res.send({
+      success: true,
+      message: "Image uploaded successfully",
+      data: imageURL,
+      status: 200,
+    });
+  } catch (error) {
+    res.send({
+      success: false,
+      message: error.message,
+      status: 500,
+    });
   }
 });
 

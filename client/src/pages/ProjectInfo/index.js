@@ -10,7 +10,7 @@ import Tasks from './Tasks';
 import Members from './Members';
 
 function ProjectInfo() {
-  const [currentUserRole, setCurrentUserRole] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState("");
   const { user } = useSelector(state => state.users)
   const [project, setProject] = useState(null);
   const dispatch = useDispatch();
@@ -22,8 +22,7 @@ function ProjectInfo() {
       dispatch(SetLoading(false));
       if (response.success) {
         setProject(response.data);
-        const currentUser = response.data.members.find(member => member.user._id === user._id);
-        console.log(currentUser.role);
+        const currentUser = response.data.members.find(member => member.user._id === user?._id);
         setCurrentUserRole(currentUser.role);
       } else {
         throw new Error(response.message);
@@ -37,6 +36,12 @@ function ProjectInfo() {
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    if (user && user._id) { // Ensure user and user._id are present
+      getData();
+    }
+  }, [user]);
 
   return (
     project && (

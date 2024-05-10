@@ -16,7 +16,7 @@ function Projects() {
   const getData = async (data) => {
     try {
       dispatch(SetLoading(true));
-      const response = await GetAllProjects();
+      const response = await GetAllProjects(); //{ owner: user._id }
       dispatch(SetLoading(false));
       if (response.success) {
         setProjects(response.data);

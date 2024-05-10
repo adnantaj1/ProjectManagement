@@ -16,7 +16,7 @@ function Tasks({ project }) {
   });
   const [showViewTask, setShowViewTask] = React.useState(false);
   const [tasks, setTasks] = useState([]);
-  const { user } = useSelector(state => state.users);
+  const { user } = useSelector((state) => state.users);
   const dispatch = useDispatch();
   const isEmployee = project.members
     .find(member => member.role === 'employee' && member.user._id === user._id);
@@ -220,7 +220,7 @@ function Tasks({ project }) {
               project.members
                 .filter(member => member.role === 'admin' || member.role === 'owner')
                 .map(member => (
-                  <option value={member.user._id}>{member.user.firstName + '' + member.user.lastName}</option>
+                  <option value={member.user._id}>{member.user.firstName + ' ' + member.user.lastName}</option>
                 ))
             }
           </select>
@@ -243,7 +243,7 @@ function Tasks({ project }) {
               project.members
                 .filter(member => member.role === 'employee')
                 .map(member => (
-                  <option value={member.user._id}>{member.user.firstName + '' + member.user.lastName}</option>
+                  <option value={member.user._id}>{member.user.firstName + ' ' + member.user.lastName}</option>
                 ))
             }
           </select>
@@ -272,11 +272,22 @@ function Tasks({ project }) {
           width={800}
         >
           <Divider />
-          <h1 className='text-xl text-primary'>{task.name}</h1>
-          <span className='text-[14px] text-gray-500'>
-            {task.description}
-          </span>
-
+          <div className='flex flex-col'>
+            <span className='text-md text-primary font-semibold'>{task.name}</span>
+            <span className='text-[14px] text-gray-500'>
+              {task.description}
+            </span>
+            <div className="flex gap-5">
+              {task.attachments.map((image) => {
+                return (
+                  <img
+                    src={image}
+                    alt=''
+                    className='w-40 h-40 object-cover mt-2 p-2 border border-solid rounded border-gray-500' />
+                )
+              })}
+            </div>
+          </div>
         </Modal>
       )}
     </div>

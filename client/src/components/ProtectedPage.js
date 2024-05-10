@@ -37,7 +37,6 @@ function ProtectPage({ children }) {
     try {
       dispatch(SetLoading(true));
       const response = await GetAllNotifications();
-      console.log(response);
       dispatch(SetLoading(false));
       if (response.success) {
         dispatch(SetNotifications(response.data));

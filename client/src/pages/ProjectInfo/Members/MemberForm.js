@@ -3,6 +3,7 @@ import { Modal, Form, Input, message } from 'antd';
 import { useDispatch } from 'react-redux';
 import { SetLoading } from '../../../redux/loadersSlice';
 import { AddMemberToProject } from '../../../apicalls/projects';
+import { CheckEmailExistence } from '../../../apicalls/users';
 import { getAntdFormInputRules } from '../../../utils/helpers';
 function MemberFormm({
   showMemberForm,
@@ -10,20 +11,19 @@ function MemberFormm({
   reloadData,
   project,
 }) {
-  console.log(project.members);
   const formRef = React.useRef(null);
   const dispatch = useDispatch();
   const onFinish = async (values) => {
     try {
-      // check if email already exists
-      const emailExists = project.members.find(
-        (member) => member.user.email === values.email
-      );
-      if (emailExists) {
-        dispatch(SetLoading(false));
-        throw new Error('User already a member of this project')
-      } else {
-        // add new members
+      dispatch(SetLoading(true));
+      const emailCheck = await CheckEmailExistence(values.email);
+      dispatch(SetLoading(false));
+      if (emailCheck.success) {
+        const emailExistsInProject = project.members.some(member => member.user.email === values.email);
+        if (emailExistsInProject) {
+          message.error('User already a member of this project');
+          return;
+        }
         dispatch(SetLoading(true));
         const response = await AddMemberToProject({
           projectId: project._id,
@@ -38,12 +38,15 @@ function MemberFormm({
         } else {
           message.error(response.message);
         }
+      } else {
+        message.error('Email does not exist in the database');
       }
     } catch (err) {
       dispatch(SetLoading(false));
-      message.error(err.message);
+      message.error('Error: ' + err.message);
     }
-  }
+  };
+
   return (
     <Modal
       title='ADD MEMBER'

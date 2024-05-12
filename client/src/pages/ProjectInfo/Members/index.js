@@ -1,118 +1,119 @@
-import React from 'react';
-import { Button, Table, message } from 'antd';
-import MemberForm from './MemberForm';
-import { useSelector, useDispatch } from 'react-redux';
-import { SetLoading } from '../../../redux/loadersSlice';
-import { RemoveMemberFromProject } from '../../../apicalls/projects';
+import { Button, message, Table } from "antd";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RemoveMemberFromProject } from "../../../apicalls/projects";
+import { SetLoading } from "../../../redux/loadersSlice";
+import MemberForm from "./MemberForm";
 
 function Members({ project, reloadData }) {
-  const [role, setRole] = React.useState('');
+  const [role, setRole] = React.useState("");
   const [showMemberForm, setShowMemberForm] = React.useState(false);
   const { user } = useSelector((state) => state.users);
+
   const dispatch = useDispatch();
   const isOwner = project.owner._id === user._id;
 
   const deleteMember = async (memberId) => {
+    dispatch(SetLoading(true));
     try {
-      dispatch(SetLoading(true));
       const response = await RemoveMemberFromProject({
         projectId: project._id,
         memberId,
       });
       if (response.success) {
-        dispatch(SetLoading(false));
+        message.success('Member removed successfully');
         reloadData();
-        message.success(response.message);
       } else {
-        throw new Error(response.error);
+        message.error(response.message);
       }
-    } catch (err) {
+    } catch (error) {
+      message.error('Failed to remove member: ' + error.message);
+    } finally {
       dispatch(SetLoading(false));
-      message.error(err.message);
     }
   };
 
   const columns = [
     {
-      title: 'First Name',
-      dataIndex: 'firstName',
+      title: "First Name",
+      dataIndex: "firstName",
       render: (text, record) => record.user.firstName,
     },
     {
-      title: 'Last Name',
-      dataIndex: 'lastName',
+      title: "Last Name",
+      dataIndex: "lastName",
       render: (text, record) => record.user.lastName,
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
+      title: "Email",
+      dataIndex: "email",
       render: (text, record) => record.user.email,
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
+      title: "Role",
+      dataIndex: "role",
       render: (text, record) => record.role.toUpperCase(),
     },
     {
-      title: 'Action',
-      dataIndex: 'action',
+      title: "Action",
+      dataIndex: "action",
       render: (text, record) => (
-        <Button
-          type='primary' danger
-          onClick={() => deleteMember(record._id)}
-        >
+        <Button type="primary" danger onClick={() => deleteMember(record._id)}>
           Remove
         </Button>
       ),
-    }
+    },
   ];
 
-  // if not owner, then don't show the action
+  // if not owner, then don't show the action column
   if (!isOwner) {
     columns.pop();
   }
+
   return (
     <div>
-      <div className='flex justify-end'>
+      <div className="flex justify-end">
         {isOwner && (
-          <Button type='default'
-            onClick={() => setShowMemberForm(true)}
-          >Add Member
+          <Button type="default" onClick={() => setShowMemberForm(true)}>
+            Add Member
           </Button>
         )}
       </div>
-      <div className='w-48'>
-        <span>
-          Select Role
-        </span>
-        <select
-          onChange={(e) => setRole(e.target.value)}
-          value={role}
-        >
-          <option value=''>All</option>
-          <option value='employee'> Employee</option>
-          <option value='admin'> Admin</option>
-          <option value='owner'> Owner</option>
+
+      <div
+        className="w-48"
+      >
+        <span>Select Role</span>
+        <select onChange={(e) => setRole(e.target.value)} value={role}>
+          <option value="">All</option>
+          <option value="employee">Employee</option>
+          <option value="admin">Admin</option>
+          <option value="owner">Owner</option>
         </select>
       </div>
-      <Table className='mt-6'
+
+      <Table
         columns={columns}
         dataSource={project.members.filter((member) => {
-          if (role === '') {
+          if (role === "") {
             return true;
           } else {
             return member.role === role;
           }
         })}
+        className="mt-4"
       />
-      {showMemberForm && <MemberForm
-        showMemberForm={showMemberForm}
-        setShowMemberForm={setShowMemberForm}
-        reloadData={reloadData}
-        project={project}
-      />}
+
+      {showMemberForm && (
+        <MemberForm
+          showMemberForm={showMemberForm}
+          setShowMemberForm={setShowMemberForm}
+          reloadData={reloadData}
+          project={project}
+        />
+      )}
     </div>
-  )
+  );
 }
 
 export default Members;

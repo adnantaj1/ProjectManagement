@@ -78,4 +78,30 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
+// Check if email exists
+router.post('/check-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(200).send({
+        success: true,
+        exists: true,
+        message: 'Email exists',
+      });
+    }
+    return res.status(404).send({
+      success: false,
+      exists: false,
+      message: 'Email does not exist',
+    });
+  } catch (err) {
+    res.status(500).send({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
+
 module.exports = router;

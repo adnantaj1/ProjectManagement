@@ -58,8 +58,14 @@ function Home() {
             </div>
           </div>
         ))}
-
       </div>
+      {projects.length === 0 && (
+        <div className="flex">
+          <h1 className="text-primary text-xl">
+            You have no projects yet
+          </h1>
+        </div>
+      )}
     </div>
   );
 }

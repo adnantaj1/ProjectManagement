@@ -27,7 +27,7 @@ router.post('/create-project', authMiddleware, async (req, res) => {
 router.post('/get-all-projects', authMiddleware, async (req, res) => {
   try {
     const filters = req.query.filters;
-    const projects = await Project.find(filters || {}).sort({ createdAt: -1 });
+    const projects = await Project.find({ owner: req.body.userId }).sort({ createdAt: -1 });
     res.send({
       success: true,
       data: projects,
@@ -171,15 +171,16 @@ router.post('/remove-member', async (req, res) => {
   try {
     const { memberId, projectId } = req.body;
     const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).send({ success: false, message: "Project not found" });
+    }
     project.members.pull(memberId);
     await project.save();
+    res.send({ success: true, message: 'Member removed successfully' });
   } catch (err) {
-    res.send({
-      success: false,
-      error: err.message,
-      status: 500,
-    })
+    res.status(500).send({ success: false, message: 'Failed to remove member', error: err.message });
   }
 });
+
 
 module.exports = router;

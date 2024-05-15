@@ -1,0 +1,148 @@
+openapi: 3.0.0
+info:
+  title: Project Management App
+  description: API for managing projects
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: LocalHost development server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        firstName: "John"
+        lastName: "Doe"
+        email: "john.doe@example.com"
+        password: "securepassword123"
+
+    ProjectMember:
+      type: object
+      required:
+        - user
+        - role
+      properties:
+        user:
+          type: string
+          format: uuid
+        role:
+          type: string
+      example:
+        user: "123e4567-e89b-12d3-a456-426614174000"
+        role: "owner"
+
+    Project:
+      type: object
+      required:
+        - name
+        - description
+        - status
+        - owner
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          default: "active"
+        owner:
+          type: string
+          format: uuid
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectMember'
+      example:
+        name: "New Software Development"
+        description: "Project to develop a new software application"
+        status: "active"
+        owner: "123e4567-e89b-12d3-a456-426614174000"
+        members:
+          - user: "123e4567-e89b-12d3-a456-426614174000"
+            role: "owner"
+      
+    Task:
+      type: object
+      required:
+        - name
+        - description
+        - status
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          default: "pending"
+        project:
+          type: string
+          format: uuid
+        assignedTo:
+          type: string
+          format: uuid
+        assignedBy:
+          type: string
+          format: uuid
+        attachments:
+          type: array
+          items:
+            type: string
+      example:
+        name: "Frontend Development"
+        description: "Develop the new UI for the customer dashboard"
+        status: "active"
+        project: "123e4567-e89b-12d3-a456-426614174000"
+        assignedTo: "123e4567-e89b-12d3-a456-426614174000"
+        assignedBy: "123e4567-e89b-12d3-a456-426614174000"
+        attachments: []
+
+    Notification:
+      type: object
+      required:
+        - user
+        - title
+        - description
+        - onClick
+      properties:
+        user:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        onClick:
+          type: string
+        read:
+          type: boolean
+          default: false
+      example:
+        user: "123e4567-e89b-12d3-a456-426614174000"
+        title: "New Task Assigned"
+        description: "You have been assigned a new task"
+        onClick: "/tasks/123"
+        read: false
+
+paths:

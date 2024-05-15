@@ -24,9 +24,19 @@ function TaskForm({
   const onFinish = async (values) => {
     try {
       dispatch(SetLoading(true));
-      let response = null;
+
+      // Find if the user is a member of the project
       const assignedToMember = project.members.find((member) => member.user.email === email);
-      const assignedToUserId = assignedToMember?.user._id;
+
+      if (!assignedToMember) {
+        dispatch(SetLoading(false));
+        message.error("This user is not a member of the project.");
+        return; // Stop execution if the user is not a member
+      }
+
+      let response = null;
+      const assignedToUserId = assignedToMember.user._id;
+
       if (task) {
         // update task
         response = await UpdateTask({
@@ -41,7 +51,7 @@ function TaskForm({
           throw new Error("Session error: User information is missing.");
         }
 
-        // need to add, filter before saving
+        // Create task only if user is part of the project
         response = await CreateTask({
           ...values,
           project: project._id,

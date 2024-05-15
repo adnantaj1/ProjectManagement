@@ -78,7 +78,7 @@ function ProjectInfo() {
         </div>
         <Divider />
         <Tabs defaultActiveKey='1'>
-          <Tabs.TabPane tab='Taks' key='1' >
+          <Tabs.TabPane tab='Task' key='1' >
             <Tasks project={project} />
           </Tabs.TabPane>
           <Tabs.TabPane tab='Members' key='2' >

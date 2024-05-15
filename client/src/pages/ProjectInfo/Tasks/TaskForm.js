@@ -40,6 +40,8 @@ function TaskForm({
         if (!assignedBy) {
           throw new Error("Session error: User information is missing.");
         }
+
+        // need to add, filter before saving
         response = await CreateTask({
           ...values,
           project: project._id,

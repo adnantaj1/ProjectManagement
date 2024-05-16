@@ -14,7 +14,7 @@ components:
       type: apiKey
       in: header
       name: Authorization
-      description: "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'"
+      description: "JWT Authorization header using the Bearer scheme. Login using: 'Bearer {your_data_token}'"
 
   schemas:
     User:
@@ -25,6 +25,9 @@ components:
         - email
         - password
       properties:
+        _id:
+          type: string
+          format: uuid
         firstName:
           type: string
         lastName:
@@ -117,8 +120,8 @@ components:
         description: "Develop the new UI for the customer dashboard"
         status: "active"
         project: "123e4567-e89b-12d3-a456-426614174000"
-        assignedTo: "123e4567-e89b-12d3-a456-426614174000"
-        assignedBy: "123e4567-e89b-12d3-a456-426614174000"
+        assignedTo: "66438773389800762ffc1b71"
+        assignedBy: "66438773389800762ffc1b71"
         attachments: []
 
     Notification:
@@ -142,7 +145,7 @@ components:
           type: boolean
           default: false
       example:
-        user: "123e4567-e89b-12d3-a456-426614174000"
+        user: "66438773389800762ffc1b71"
         title: "New Task Assigned"
         description: "You have been assigned a new task"
         onClick: "/tasks/123"
@@ -307,6 +310,10 @@ paths:
             schema:
               $ref: '#/components/schemas/Project'
               description: Data to be updated for the project
+              properties:
+                _id:
+                  type: string
+                  description: The unique identifier of the project to update
       responses:
         '200':
           description: Project updated successfully

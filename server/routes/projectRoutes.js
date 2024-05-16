@@ -91,7 +91,9 @@ router.post('/get-projects-by-role', authMiddleware, async (req, res) => {
 // edit project
 router.post('/edit-project', authMiddleware, async (req, res) => {
   try {
-    const project = await Project.findByIdAndUpdate(req.body._id, req.body);
+    const updatedData = req.body;
+    const project = await Project.findByIdAndUpdate(updatedData._id, updatedData, { new: true });
+
     if (!project) {
       throw new Error('Project not found');
     }
@@ -100,15 +102,17 @@ router.post('/edit-project', authMiddleware, async (req, res) => {
       data: project,
       message: 'Project updated successfully',
       status: 200,
-    })
+    });
+    
   } catch (err) {
     res.send({
       success: false,
       error: err.message,
       status: 500,
-    })
+    });
   }
 });
+
 
 // delete project
 router.post('/delete-project', authMiddleware, async (req, res) => {
